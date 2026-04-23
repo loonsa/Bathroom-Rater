@@ -1,4 +1,4 @@
-package com.example.dummy
+package com.example.bathroomrater
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
