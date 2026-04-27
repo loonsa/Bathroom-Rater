@@ -18,7 +18,7 @@ class ServerTaskGetBathrooms: Thread {
         super.run()
         var result: String = ""
         try {
-            val url: URL = URL("firebase url")
+            val url: URL = URL("https://bathroom-rater-20697-default-rtdb.firebaseio.com/bathrooms.json")
             val iStream: InputStream = url.openStream()
             val scan: Scanner = Scanner( iStream )
             while (scan.hasNext()) {
@@ -26,7 +26,7 @@ class ServerTaskGetBathrooms: Thread {
             }
 
             val bathrooms: ArrayList<Bathroom> = parseJSON(result)
-            mainActivity.runOnUiThread{ mainActivity.loadBathrooms(bathrooms) }
+            mainActivity.runOnUiThread{ mainActivity.loadBathrooms(bathrooms) } //loadBathrooms needs to be implemented
         } catch(e: Exception ) {
             Log.w( "MainActivity", "exception: " + e.message )
         }

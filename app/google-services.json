@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "104477475278",
+    "project_id": "bathroom-rater-20697",
+    "storage_bucket": "bathroom-rater-20697.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104477475278:android:8962611da1509fa85a2b9f",
+        "android_client_info": {
+          "package_name": "com.example.bathroomrater"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlK1uXNKjzGdylH09WcD5VzJdZexSWjEE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
