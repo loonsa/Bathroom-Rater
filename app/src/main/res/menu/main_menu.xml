@@ -8,18 +8,23 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/sort_highest_rated"
-        android:title="Sort: Highest Rated"
+        android:id="@+id/filter_top_rated"
+        android:title="Show #1 Highest Rated"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/sort_nearest"
-        android:title="Sort: Nearest"
+        android:id="@+id/filter_favorites"
+        android:title="Show My Favorites"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/sort_most_reviews"
-        android:title="Sort: Most Reviews"
+        android:id="@+id/filter_gender_neutral"
+        android:title="Show Gender Neutral Only"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/filter_clear"
+        android:title="Clear Filters (Show All)"
         app:showAsAction="never" />
 
 </menu>

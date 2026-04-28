@@ -34,24 +34,25 @@ class LocalPersistentDataHandler {
         editor.commit()
     }
 
-    fun isShowGenderNeutralOnly(): Boolean {
-        val genderNeutralOnly: Boolean = pref.getBoolean("genderNeutralOnly", false)
-        return genderNeutralOnly
+    fun filterStatus(filter: String): Boolean {
+        //filter should be either
+        //topOnly, favoritesOnly, or genderNeutralOnly
+        val filterStatus: Boolean = pref.getBoolean(filter, false)
+        return filterStatus
+    }
+
+    fun setShowTopOnly(userPreference: Boolean) {
+        editor.putBoolean("topOnly", userPreference)
+        editor.commit()
+    }
+
+    fun setShowFavoritesOnly(userPreference: Boolean) {
+        editor.putBoolean("favoritesOnly", userPreference)
+        editor.commit()
     }
 
     fun setShowGenderNeutralOnly(userPreference: Boolean) {
         editor.putBoolean("genderNeutralOnly", userPreference)
         editor.commit()
     }
-
-    fun getSortOrderPref(): String {
-        val sortOrder: String = pref.getString("sortOrder", "highest_rated") ?: "highest_rated"
-        return sortOrder
-    }
-
-    fun setSortOrderPref(userPreference: String) {
-        editor.putString("sortOrder", userPreference)
-        editor.commit()
-    }
-
 }

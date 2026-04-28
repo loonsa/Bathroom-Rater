@@ -55,9 +55,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val prefs = LocalPersistentDataHandler(this)
         when (item.itemId) {
-            R.id.sort_highest_rated -> prefs.setSortOrderPref("highest_rated")
-            R.id.sort_nearest -> prefs.setSortOrderPref("nearest")
-            R.id.sort_most_reviews -> prefs.setSortOrderPref("most_reviews")
+            R.id.filter_top_rated -> prefs.setShowTopOnly(true)
+            R.id.filter_favorites -> prefs.setShowFavoritesOnly(true)
+            R.id.filter_gender_neutral -> prefs.setShowGenderNeutralOnly(true)
+            R.id.filter_clear -> {
+                prefs.setShowTopOnly(false)
+                prefs.setShowFavoritesOnly(false)
+                prefs.setShowGenderNeutralOnly(false)
+            }
             R.id.refresh -> {
                 Toast.makeText(this, "Refreshing bathroom data", Toast.LENGTH_SHORT).show()
 
