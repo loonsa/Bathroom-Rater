@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sort_highest_rated"
+        android:title="Sort: Highest Rated"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sort_nearest"
+        android:title="Sort: Nearest"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/sort_most_reviews"
+        android:title="Sort: Most Reviews"
+        app:showAsAction="never" />
+
+</menu>

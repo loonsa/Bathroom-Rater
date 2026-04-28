@@ -37,6 +37,7 @@ android {
 dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-database")
+    implementation("com.google.android.gms:play-services-ads:23.1.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
