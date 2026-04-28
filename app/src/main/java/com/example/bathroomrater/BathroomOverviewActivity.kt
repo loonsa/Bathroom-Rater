@@ -2,6 +2,7 @@ package com.example.bathroomrater
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.RatingBar
 import androidx.activity.enableEdgeToEdge
@@ -23,7 +24,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
 
         lpdHandler = LocalPersistentDataHandler(this)
         val bathroomId: String = intent.getStringExtra("bathroomId") ?: return
-        bathroom = MainActivity.bathrooms.find { bathroom -> bathroom.uniqueId == bathroomId }
+        bathroom = MainActivity.bathrooms.find { bathroom -> bathroom.uniqueId == bathroomId } ?: run {
+            Log.w("BathroomOverviewActivity", "bathroom wasn't found in MainActivity")
+            this.finish()
+            return
+        }
 
         ratingBar = findViewById(R.id.rating_bar)
         ratingBar.rating = bathroom.averageRating.toFloat()
