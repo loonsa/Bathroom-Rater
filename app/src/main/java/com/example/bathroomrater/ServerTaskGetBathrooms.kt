@@ -26,7 +26,7 @@ class ServerTaskGetBathrooms: Thread {
             }
 
             val bathrooms: ArrayList<Bathroom> = parseJSON(result)
-            mainActivity.runOnUiThread{ mainActivity.loadBathrooms(bathrooms) } //loadBathrooms needs to be implemented
+            mainActivity.runOnUiThread{ mainActivity.loadBathrooms(bathrooms) }
         } catch(e: Exception ) {
             Log.w( "MainActivity", "exception: " + e.message )
         }

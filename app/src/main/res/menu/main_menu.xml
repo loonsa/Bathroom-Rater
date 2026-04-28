@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/refresh"
+        android:title="Refresh Map"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/sort_highest_rated"
         android:title="Sort: Highest Rated"
         app:showAsAction="never" />

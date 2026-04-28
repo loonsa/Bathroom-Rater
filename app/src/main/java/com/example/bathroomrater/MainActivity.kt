@@ -1,5 +1,6 @@
 package com.example.bathroomrater
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.Toast
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -32,7 +35,16 @@ class MainActivity : AppCompatActivity() {
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
 
+        val addBathroomButton: Button = findViewById<Button>(R.id.add_bathroom)
+        addBathroomButton.setOnClickListener {
+            val intent: Intent = Intent(this, AddBathroomActivity::class.java)
+            startActivity(intent)
+        }
+
         // TODO: Member 1 — add Google Maps, GPS, filter switch, ServerTaskGetBathrooms here
+        // TODO: also needs to setOnMarkerClickListener to pass the bathroomId to BathroomOverviewActivity
+        // and then launch BathroomOverviewActivity
+        // IMPORTANT: the bathroomId is the key for the JSON bathroom object and is also its uniqueId field
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -46,6 +58,12 @@ class MainActivity : AppCompatActivity() {
             R.id.sort_highest_rated -> prefs.setSortOrderPref("highest_rated")
             R.id.sort_nearest -> prefs.setSortOrderPref("nearest")
             R.id.sort_most_reviews -> prefs.setSortOrderPref("most_reviews")
+            R.id.refresh -> {
+                Toast.makeText(this, "Refreshing bathroom data", Toast.LENGTH_SHORT).show()
+
+                val refreshTask: ServerTaskGetBathrooms = ServerTaskGetBathrooms(this)
+                refreshTask.start()
+            }
         }
         // TODO: Member 1 — refresh map pins after sort change
         return true

@@ -25,6 +25,7 @@
         </activity>
 
         <activity android:name=".BathroomOverviewActivity" />
+        <activity android:name=".AddBathroomActivity" />
         <activity android:name=".AddReviewActivity" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

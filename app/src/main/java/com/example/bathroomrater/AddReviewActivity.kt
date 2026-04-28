@@ -77,6 +77,18 @@ class AddReviewActivity : AppCompatActivity() {
             val task = ServerTaskAddReview(review)
             task.start()
 
+            val bathroom: Bathroom? = MainActivity.bathrooms.find { bathroom -> bathroom.uniqueId == bathroomId }
+            if (bathroom != null) {
+                val oldTotalStars: Double = bathroom.averageRating * bathroom.numReviews
+                val newTotalStars: Double = oldTotalStars + selectedRating.toDouble()
+
+                bathroom.numReviews += 1
+                bathroom.averageRating = newTotalStars / bathroom.numReviews
+
+                val updateTask: ServerTaskUpdateBathroom = ServerTaskUpdateBathroom(bathroomId, bathroom.averageRating, bathroom.numReviews)
+                updateTask.start()
+            }
+
             Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
             finish()
         }
