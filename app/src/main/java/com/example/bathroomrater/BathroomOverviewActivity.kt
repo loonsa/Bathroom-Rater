@@ -13,6 +13,9 @@ class BathroomOverviewActivity: AppCompatActivity() {
     private lateinit var lpdHandler: LocalPersistentDataHandler
     private lateinit var ratingBar: RatingBar
     private lateinit var bathroom: Bathroom
+    private lateinit var addReviewButton: Button
+    private lateinit var addFavoriteButton: Button
+    private lateinit var backButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,14 +28,14 @@ class BathroomOverviewActivity: AppCompatActivity() {
         ratingBar = findViewById(R.id.rating_bar)
         ratingBar.rating = bathroom.averageRating.toFloat()
 
-        val addReviewButton: Button = findViewById<Button>(R.id.add_review)
+        addReviewButton = findViewById<Button>(R.id.add_review)
         addReviewButton.setOnClickListener {
             val intent: Intent = Intent(this, AddReviewActivity::class.java)
             intent.putExtra("bathroomId", bathroom.uniqueId)
             startActivity(intent)
         }
 
-        val addFavoriteButton: Button = findViewById<Button>(R.id.add_favorite)
+        addFavoriteButton = findViewById<Button>(R.id.add_favorite)
         addFavoriteButton.setOnClickListener {
             if (lpdHandler.getFavorites().contains(bathroom.uniqueId)) {
                 lpdHandler.removeFavorite(bathroom.uniqueId)
@@ -41,6 +44,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
                 lpdHandler.addFavorite(bathroom.uniqueId)
                 addFavoriteButton.text = "Remove from Favorites"
             }
+        }
+
+        backButton = findViewById<Button>(R.id.back)
+        backButton.setOnClickListener {
+            this.finish()
         }
     }
 }
