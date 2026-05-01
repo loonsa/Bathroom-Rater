@@ -8,15 +8,25 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- TODO: Member 1 — replace with Map fragment, filter Switch -->
-    <TextView
+    <!-- Map fragment, filter Switch -->
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/filter_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    
+    <Switch
+        android:id="@+id/filter_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bathroom Rater"
+        android:text="Gender Neutral Only"
         app:layout_constraintBottom_toTopOf="@id/ad_view"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="10dp" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/ad_view"
@@ -35,7 +45,7 @@
         android:text="+ Add Bathroom"
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/ad_view"
         android:layout_marginBottom="95dp"
         android:layout_marginRight="13dp"
         app:backgroundTint="#17236A"
