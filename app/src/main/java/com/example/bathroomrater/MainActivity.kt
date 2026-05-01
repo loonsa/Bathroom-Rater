@@ -1,5 +1,14 @@
 package com.example.bathroomrater
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.widget.Switch
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.MarkerOptions
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -14,8 +23,11 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private lateinit var map : GoogleMap
+    private lateinit var prefs : LocalPersistentDataHandler
+    
     companion object {
         var bathrooms: ArrayList<Bathroom> = ArrayList()
     }
@@ -41,10 +53,71 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // TODO: Member 1 — add Google Maps, GPS, filter switch, ServerTaskGetBathrooms here
-        // TODO: also needs to setOnMarkerClickListener to pass the bathroomId to BathroomOverviewActivity
-        // and then launch BathroomOverviewActivity
-        // IMPORTANT: the bathroomId is the key for the JSON bathroom object and is also its uniqueId field
+        prefs = LocalPersistentDataHandler(this) // saved filter data
+        val filterSwitch: Switch = findViewById<Switch>(R.id.filter_switch)
+        filterSwitch.isChecked = prefs.filterStatus("genderNeutralOnly")
+        filterSwitch.setOnCheckedChangeListener {_, isChecked->
+            prefs.setShowGenderNeutralOnly(isChecked)
+            refreshMapPins()
+            }
+
+        val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+        val task: ServerTaskGetBathrooms = ServerTaskGetBathrooms(this)
+        task.start()
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+
+        if (ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        map.isMyLocationEnabled = true
+    }
+
+    map.moveCamera(
+        CameraUpdateFactory.newLatLngZoom(
+            com.google.android.gms.maps.model.LatLng(38.9869, -76.9426),
+            15f
+        )
+    )
+
+    refreshMapPins()
+}
+
+    fun refreshMapPins() {
+
+        if (!::map.isInitialized) {
+            return
+        }
+
+        map.clear()
+
+        var shownBathrooms: List<Bathroom> = bathrooms
+
+        if (prefs.filterStatus("genderNeutralOnly")) {
+            shownBathrooms = shownBathrooms.filter { bathroom -> bathroom.isGenderNeutral
+            }
+        }
+
+        for (bathroom in shownBathrooms) {
+            val marker = map.addMarker(
+                MarkerOptions()
+                    .position(bathroom.latLng)
+                    .title(bathroom.name)
+            )
+
+            marker?.tag = bathroom
+        }
+
+        map.setOnMarkerClickListener { marker -> val bathroom: Bathroom = marker.tag as Bathroom
+
+            val intent: Intent = Intent(this, BathroomOverviewActivity::class.java)
+            intent.putExtra("bathroomId", bathroom.uniqueId)
+            startActivity(intent)
+
+            true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -53,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val prefs = LocalPersistentDataHandler(this)
+        prefs = LocalPersistentDataHandler(this)
         when (item.itemId) {
             R.id.filter_top_rated -> prefs.setShowTopOnly(true)
             R.id.filter_favorites -> prefs.setShowFavoritesOnly(true)
@@ -70,12 +143,12 @@ class MainActivity : AppCompatActivity() {
                 refreshTask.start()
             }
         }
-        // TODO: Member 1 — refresh map pins after sort change
+        refreshMapPins()
         return true
     }
 
     fun loadBathrooms(bathrooms: ArrayList<Bathroom>) {
         MainActivity.bathrooms = bathrooms
-        // TODO: Member 1 — refresh map pins
+        refreshMapPins()
     }
 }
