@@ -3,13 +3,15 @@ package com.example.bathroomrater
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BathroomOverviewActivity: AppCompatActivity() {
     private lateinit var lpdHandler: LocalPersistentDataHandler
@@ -20,6 +22,7 @@ class BathroomOverviewActivity: AppCompatActivity() {
     private lateinit var addReviewButton: Button
     private lateinit var addFavoriteButton: Button
     private lateinit var backButton: Button
+    private lateinit var reviewsBox: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +37,20 @@ class BathroomOverviewActivity: AppCompatActivity() {
             return
         }
 
+        val bathroomName: TextView = findViewById(R.id.bathroom_name)
+        val buildingAndFloor: TextView = findViewById(R.id.building_and_floor)
+        val genderNeutral: TextView = findViewById(R.id.gender_neutral)
+        val adaAccessible: TextView = findViewById(R.id.ada_accessible)
+
+        bathroomName.text = bathroom.name
+        buildingAndFloor.text = "${bathroom.building} - Floor ${bathroom.floor}"
+        genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
+        adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
+
         ratingBar = findViewById(R.id.rating_bar)
         avgRating = findViewById(R.id.avg_rating)
         numReviews = findViewById(R.id.num_reviews)
+        reviewsBox = findViewById(R.id.reviews_box)
 
         addReviewButton = findViewById<Button>(R.id.add_review)
         addReviewButton.setOnClickListener {
@@ -69,6 +83,60 @@ class BathroomOverviewActivity: AppCompatActivity() {
             ratingBar.rating = bathroom.averageRating.toFloat()
             avgRating.text = bathroom.averageRating.toString()
             numReviews.text = bathroom.numReviews.toString()
+
+            val task = ServerTaskGetReviews(this, bathroom.uniqueId)
+            task.start()
+        }
+    }
+
+    fun loadReviews(reviews: ArrayList<Review>) {
+        reviewsBox.removeAllViews()
+
+        // Calculate rating from actual reviews
+        if (reviews.isNotEmpty()) {
+            val calculatedAvg = reviews.sumOf { it.rating } / reviews.size
+            val roundedAvg = Math.round(calculatedAvg * 10) / 10.0
+            ratingBar.rating = roundedAvg.toFloat()
+            avgRating.text = roundedAvg.toString()
+            numReviews.text = reviews.size.toString()
+        }
+
+        if (reviews.isEmpty()) {
+            val noReviews = TextView(this)
+            noReviews.text = "No reviews yet"
+            noReviews.textSize = 15f
+            noReviews.setTextColor(0xFF777777.toInt())
+            reviewsBox.addView(noReviews)
+            return
+        }
+
+        reviews.sortByDescending { it.timeOfReview }
+
+        for (review in reviews) {
+            val card = LinearLayout(this)
+            card.orientation = LinearLayout.VERTICAL
+            card.setPadding(0, 0, 0, 30)
+
+            val username = TextView(this)
+            username.text = "${review.username} — ${review.rating}/5.0"
+            username.textSize = 16f
+            username.setTextColor(0xFF111111.toInt())
+            card.addView(username)
+
+            val comment = TextView(this)
+            comment.text = review.comment
+            comment.textSize = 14f
+            comment.setTextColor(0xFF444444.toInt())
+            card.addView(comment)
+
+            val date = TextView(this)
+            val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+            date.text = sdf.format(Date(review.timeOfReview))
+            date.textSize = 12f
+            date.setTextColor(0xFF999999.toInt())
+            card.addView(date)
+
+            reviewsBox.addView(card)
         }
     }
 }
