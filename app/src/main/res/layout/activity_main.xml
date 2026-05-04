@@ -15,18 +15,34 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/filter_switch"
+        app:layout_constraintBottom_toTopOf="@id/filter_switches"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-    
-    <Switch
-        android:id="@+id/filter_switch"
+
+    <LinearLayout
+        android:id="@+id/filter_switches"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Gender Neutral Only"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toTopOf="@id/ad_view"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="10dp" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/filter_switch_gender_neutral"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender Neutral Only   "
+            android:layout_marginEnd="50dp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/filter_switch_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Favorites Only   " />
+
+    </LinearLayout>
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/ad_view"
@@ -46,7 +62,7 @@
         android:textSize="17sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/ad_view"
-        android:layout_marginBottom="95dp"
+        android:layout_marginBottom="65dp"
         android:layout_marginRight="13dp"
         app:backgroundTint="#17236A"
         android:paddingTop="15dp"

@@ -36,6 +36,7 @@ class BathroomOverviewActivity: AppCompatActivity() {
             this.finish()
             return
         }
+        lpdHandler.setLastViewedBathroomId(bathroom.uniqueId) //should be same thing as bathroomId variable
 
         val bathroomName: TextView = findViewById(R.id.bathroom_name)
         val buildingAndFloor: TextView = findViewById(R.id.building_and_floor)
@@ -44,8 +45,14 @@ class BathroomOverviewActivity: AppCompatActivity() {
 
         bathroomName.text = bathroom.name
         buildingAndFloor.text = "${bathroom.building} - Floor ${bathroom.floor}"
-        genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
-        adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
+        if (!bathroom.isGenderNeutral && !bathroom.isADA) {
+            genderNeutral.text = "None" //just use genderNeutral textView to hold None
+            adaAccessible.visibility = View.GONE
+        } else {
+            genderNeutral.text = "Gender Neutral"
+            genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
+            adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
+        }
 
         ratingBar = findViewById(R.id.rating_bar)
         avgRating = findViewById(R.id.avg_rating)
@@ -69,6 +76,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
                 addFavoriteButton.text = "Remove from Favorites"
             }
         }
+        if (lpdHandler.getFavorites().contains(bathroom.uniqueId)) {
+            addFavoriteButton.text = "Remove from Favorites"
+        } else {
+            addFavoriteButton.text = "Add to Favorites"
+        }
 
         backButton = findViewById<Button>(R.id.back)
         backButton.setOnClickListener {
@@ -82,7 +94,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
             ::avgRating.isInitialized && ::numReviews.isInitialized) {
             ratingBar.rating = bathroom.averageRating.toFloat()
             avgRating.text = bathroom.averageRating.toString()
-            numReviews.text = bathroom.numReviews.toString()
+            var quantifier: String = " reviews"
+            if (bathroom.numReviews == 1) {
+                quantifier = " review"
+            }
+            numReviews.text = bathroom.numReviews.toString() + quantifier
 
             val task = ServerTaskGetReviews(this, bathroom.uniqueId)
             task.start()
@@ -98,7 +114,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
             val roundedAvg = Math.round(calculatedAvg * 10) / 10.0
             ratingBar.rating = roundedAvg.toFloat()
             avgRating.text = roundedAvg.toString()
-            numReviews.text = reviews.size.toString()
+            var quantifier: String = " reviews"
+            if (reviews.size == 1) {
+                quantifier = " review"
+            }
+            numReviews.text = reviews.size.toString() + quantifier
         }
 
         if (reviews.isEmpty()) {

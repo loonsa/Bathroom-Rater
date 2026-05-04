@@ -10,6 +10,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,9 +20,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -54,12 +57,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         prefs = LocalPersistentDataHandler(this) // saved filter data
-        val filterSwitch: Switch = findViewById<Switch>(R.id.filter_switch)
-        filterSwitch.isChecked = prefs.filterStatus("genderNeutralOnly")
-        filterSwitch.setOnCheckedChangeListener {_, isChecked->
+        val filterSwitchGenderNeutralOnly: SwitchCompat = findViewById<SwitchCompat>(R.id.filter_switch_gender_neutral)
+        filterSwitchGenderNeutralOnly.isChecked = prefs.filterStatus("genderNeutralOnly")
+        filterSwitchGenderNeutralOnly.setOnCheckedChangeListener {_, isChecked->
             prefs.setShowGenderNeutralOnly(isChecked)
             refreshMapPins()
             }
+        val filterSwitchFavorites: SwitchCompat = findViewById<SwitchCompat>(R.id.filter_switch_favorites)
+        filterSwitchFavorites.isChecked = prefs.filterStatus("favoritesOnly")
+        filterSwitchFavorites.setOnCheckedChangeListener {_, isChecked->
+            prefs.setShowFavoritesOnly(isChecked)
+            refreshMapPins()
+        }
 
         val mapFragment: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -99,12 +108,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             shownBathrooms = shownBathrooms.filter { bathroom -> bathroom.isGenderNeutral
             }
         }
+        if (prefs.filterStatus("favoritesOnly")) {
+            shownBathrooms = shownBathrooms.filter {
+                bathroom -> prefs.getFavorites().contains(bathroom.uniqueId)
+            }
+        }
+
+        val lastViewedBathroomId: String = prefs.getLastViewedBathroomId()
 
         for (bathroom in shownBathrooms) {
+            val markerColor: Float = if (bathroom.uniqueId == lastViewedBathroomId)
+                BitmapDescriptorFactory.HUE_ORANGE
+            else
+                BitmapDescriptorFactory.HUE_RED
+
             val marker = map.addMarker(
                 MarkerOptions()
                     .position(bathroom.latLng)
                     .title(bathroom.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
             )
 
             marker?.tag = bathroom
@@ -120,6 +142,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::map.isInitialized) {
+            refreshMapPins()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -128,14 +157,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         prefs = LocalPersistentDataHandler(this)
         when (item.itemId) {
-            R.id.filter_top_rated -> prefs.setShowTopOnly(true)
-            R.id.filter_favorites -> prefs.setShowFavoritesOnly(true)
-            R.id.filter_gender_neutral -> prefs.setShowGenderNeutralOnly(true)
-            R.id.filter_clear -> {
-                prefs.setShowTopOnly(false)
-                prefs.setShowFavoritesOnly(false)
-                prefs.setShowGenderNeutralOnly(false)
-            }
             R.id.refresh -> {
                 Toast.makeText(this, "Refreshing bathroom data", Toast.LENGTH_SHORT).show()
 

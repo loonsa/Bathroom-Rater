@@ -13,6 +13,7 @@ class AddReviewActivity : AppCompatActivity() {
     private lateinit var ratingBar: RatingBar
     private lateinit var tvRatingLabel: TextView
     private lateinit var etComment: EditText
+    private lateinit var etUsername: EditText
     private var selectedRating: Float = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,6 @@ class AddReviewActivity : AppCompatActivity() {
         }
 
         // Find the bathroom name to display at the top
-        // TODO: uncomment once Member 1 adds companion object to MainActivity
         val bathroom = MainActivity.bathrooms.firstOrNull { it.uniqueId == bathroomId }
         val tvTitle = findViewById<TextView>(R.id.tv_review_title)
         tvTitle.text = "Add Review"
@@ -38,6 +38,7 @@ class AddReviewActivity : AppCompatActivity() {
         ratingBar = findViewById(R.id.rating_bar_input)
         tvRatingLabel = findViewById(R.id.tv_rating_label)
         etComment = findViewById(R.id.et_comment)
+        etUsername = findViewById<EditText>(R.id.et_username)
 
         ratingBar.onRatingBarChangeListener =
             RatingBar.OnRatingBarChangeListener { _, rating, _ ->
@@ -55,6 +56,7 @@ class AddReviewActivity : AppCompatActivity() {
         val btnSubmit = findViewById<Button>(R.id.btn_submit)
         btnSubmit.setOnClickListener {
             val comment = etComment.text.toString().trim()
+            val username = etUsername.text.toString().ifEmpty { "anonymous" }
 
             if (selectedRating == 0f) {
                 Toast.makeText(this, "Please select a rating", Toast.LENGTH_SHORT).show()
@@ -68,7 +70,7 @@ class AddReviewActivity : AppCompatActivity() {
             val review = Review(
                 "",
                 bathroomId,
-                "anonymous",
+                username,
                 selectedRating.toDouble(),
                 comment,
                 System.currentTimeMillis()

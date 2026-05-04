@@ -36,14 +36,9 @@ class LocalPersistentDataHandler {
 
     fun filterStatus(filter: String): Boolean {
         //filter should be either
-        //topOnly, favoritesOnly, or genderNeutralOnly
+        //favoritesOnly or genderNeutralOnly
         val filterStatus: Boolean = pref.getBoolean(filter, false)
         return filterStatus
-    }
-
-    fun setShowTopOnly(userPreference: Boolean) {
-        editor.putBoolean("topOnly", userPreference)
-        editor.commit()
     }
 
     fun setShowFavoritesOnly(userPreference: Boolean) {
@@ -53,6 +48,17 @@ class LocalPersistentDataHandler {
 
     fun setShowGenderNeutralOnly(userPreference: Boolean) {
         editor.putBoolean("genderNeutralOnly", userPreference)
+        editor.commit()
+    }
+
+    fun getLastViewedBathroomId(): String {
+        val lastViewedBathroomId: String = pref.getString("lastViewedBathroomId", "") ?: ""
+
+        return lastViewedBathroomId
+    }
+
+    fun setLastViewedBathroomId(bathroomId: String) {
+        editor.putString("lastViewedBathroomId", bathroomId)
         editor.commit()
     }
 }

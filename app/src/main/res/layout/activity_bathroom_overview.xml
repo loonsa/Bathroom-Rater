@@ -189,7 +189,7 @@
             android:textSize="20sp"
             android:textColor="#111"
             android:padding="15dp"
-            app:backgroundTint="#5571788F" />
+            app:backgroundTint="@color/back_button" />
 
         <Button
             android:id="@+id/add_review"

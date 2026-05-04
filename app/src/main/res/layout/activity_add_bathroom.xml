@@ -79,14 +79,12 @@
 
         <Button
             android:id="@+id/back"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="Back"
-            android:textColor="#111"
-            android:paddingLeft="60dp"
-            android:paddingRight="60dp"
-            app:backgroundTint="#5571788F"
-            android:layout_gravity="center_horizontal"/>
+            android:textColor="@color/text_secondary"
+            android:layout_gravity="center_horizontal"
+            style="?android:attr/borderlessButtonStyle"/>
     </LinearLayout>
 </ScrollView>
