@@ -74,6 +74,9 @@ class BathroomOverviewActivity: AppCompatActivity() {
                 addFavoriteButton.text = "Remove from Favorites"
             }
         }
+        if (lpdHandler.getFavorites().contains(bathroom.uniqueId)) {
+            addFavoriteButton.text = "Remove from Favorites"
+        }
 
         backButton = findViewById<Button>(R.id.back)
         backButton.setOnClickListener {
@@ -87,21 +90,22 @@ class BathroomOverviewActivity: AppCompatActivity() {
             ::avgRating.isInitialized && ::numReviews.isInitialized) {
             ratingBar.rating = bathroom.averageRating.toFloat()
             avgRating.text = bathroom.averageRating.toString()
-            numReviews.text = bathroom.numReviews.toString()
-            updateProgressBar(bathroom.averageRating)
+            numReviews.text = "${bathroom.numReviews} reviews"
+            updateProgressBar(bathroom.numReviews)
 
             val task = ServerTaskGetReviews(this, bathroom.uniqueId)
             task.start()
         }
     }
 
-    private fun updateProgressBar(rating: Double) {
-        val progress = (rating / 5.0 * 100).toInt()
+    private fun updateProgressBar(reviewCount: Int) {
+        val maxReviews = 20
+        val progress = (reviewCount.coerceAtMost(maxReviews).toDouble() / maxReviews * 100).toInt()
         ratingProgressBar.progress = progress
 
         val barColor = when {
-            rating >= 4.0 -> Color.parseColor("#4CAF50")
-            rating >= 2.0 -> Color.parseColor("#FFC107")
+            reviewCount >= 10 -> Color.parseColor("#4CAF50")
+            reviewCount >= 5 -> Color.parseColor("#FFC107")
             else -> Color.parseColor("#F44336")
         }
         ratingProgressBar.progressTintList = ColorStateList.valueOf(barColor)
@@ -115,8 +119,8 @@ class BathroomOverviewActivity: AppCompatActivity() {
             val roundedAvg = Math.round(calculatedAvg * 10) / 10.0
             ratingBar.rating = roundedAvg.toFloat()
             avgRating.text = roundedAvg.toString()
-            numReviews.text = reviews.size.toString()
-            updateProgressBar(roundedAvg)
+            numReviews.text = "${reviews.size} reviews"
+            updateProgressBar(reviews.size)
         }
 
         if (reviews.isEmpty()) {

@@ -88,7 +88,13 @@
                     android:textColor="#111"
                     android:layout_marginStart="10dp" />
             </LinearLayout>
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Popularity"
+                android:textSize="15sp"
+                android:textColor="#555"
+                android:layout_marginTop="5dp" />
             <ProgressBar
                 android:id="@+id/rating_progress_bar"
                 style="@android:style/Widget.ProgressBar.Horizontal"
