@@ -12,6 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.widget.ProgressBar
+import android.content.res.ColorStateList
+import android.graphics.Color
 
 class BathroomOverviewActivity: AppCompatActivity() {
     private lateinit var lpdHandler: LocalPersistentDataHandler
@@ -23,6 +26,7 @@ class BathroomOverviewActivity: AppCompatActivity() {
     private lateinit var addFavoriteButton: Button
     private lateinit var backButton: Button
     private lateinit var reviewsBox: LinearLayout
+    private lateinit var ratingProgressBar: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,6 @@ class BathroomOverviewActivity: AppCompatActivity() {
             this.finish()
             return
         }
-        lpdHandler.setLastViewedBathroomId(bathroom.uniqueId) //should be same thing as bathroomId variable
 
         val bathroomName: TextView = findViewById(R.id.bathroom_name)
         val buildingAndFloor: TextView = findViewById(R.id.building_and_floor)
@@ -45,19 +48,14 @@ class BathroomOverviewActivity: AppCompatActivity() {
 
         bathroomName.text = bathroom.name
         buildingAndFloor.text = "${bathroom.building} - Floor ${bathroom.floor}"
-        if (!bathroom.isGenderNeutral && !bathroom.isADA) {
-            genderNeutral.text = "None" //just use genderNeutral textView to hold None
-            adaAccessible.visibility = View.GONE
-        } else {
-            genderNeutral.text = "Gender Neutral"
-            genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
-            adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
-        }
+        genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
+        adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
 
         ratingBar = findViewById(R.id.rating_bar)
         avgRating = findViewById(R.id.avg_rating)
         numReviews = findViewById(R.id.num_reviews)
         reviewsBox = findViewById(R.id.reviews_box)
+        ratingProgressBar = findViewById(R.id.rating_progress_bar)
 
         addReviewButton = findViewById<Button>(R.id.add_review)
         addReviewButton.setOnClickListener {
@@ -76,11 +74,6 @@ class BathroomOverviewActivity: AppCompatActivity() {
                 addFavoriteButton.text = "Remove from Favorites"
             }
         }
-        if (lpdHandler.getFavorites().contains(bathroom.uniqueId)) {
-            addFavoriteButton.text = "Remove from Favorites"
-        } else {
-            addFavoriteButton.text = "Add to Favorites"
-        }
 
         backButton = findViewById<Button>(R.id.back)
         backButton.setOnClickListener {
@@ -94,31 +87,36 @@ class BathroomOverviewActivity: AppCompatActivity() {
             ::avgRating.isInitialized && ::numReviews.isInitialized) {
             ratingBar.rating = bathroom.averageRating.toFloat()
             avgRating.text = bathroom.averageRating.toString()
-            var quantifier: String = " reviews"
-            if (bathroom.numReviews == 1) {
-                quantifier = " review"
-            }
-            numReviews.text = bathroom.numReviews.toString() + quantifier
+            numReviews.text = bathroom.numReviews.toString()
+            updateProgressBar(bathroom.averageRating)
 
             val task = ServerTaskGetReviews(this, bathroom.uniqueId)
             task.start()
         }
     }
 
+    private fun updateProgressBar(rating: Double) {
+        val progress = (rating / 5.0 * 100).toInt()
+        ratingProgressBar.progress = progress
+
+        val barColor = when {
+            rating >= 4.0 -> Color.parseColor("#4CAF50")
+            rating >= 2.0 -> Color.parseColor("#FFC107")
+            else -> Color.parseColor("#F44336")
+        }
+        ratingProgressBar.progressTintList = ColorStateList.valueOf(barColor)
+    }
+
     fun loadReviews(reviews: ArrayList<Review>) {
         reviewsBox.removeAllViews()
 
-        // Calculate rating from actual reviews
         if (reviews.isNotEmpty()) {
             val calculatedAvg = reviews.sumOf { it.rating } / reviews.size
             val roundedAvg = Math.round(calculatedAvg * 10) / 10.0
             ratingBar.rating = roundedAvg.toFloat()
             avgRating.text = roundedAvg.toString()
-            var quantifier: String = " reviews"
-            if (reviews.size == 1) {
-                quantifier = " review"
-            }
-            numReviews.text = reviews.size.toString() + quantifier
+            numReviews.text = reviews.size.toString()
+            updateProgressBar(roundedAvg)
         }
 
         if (reviews.isEmpty()) {
