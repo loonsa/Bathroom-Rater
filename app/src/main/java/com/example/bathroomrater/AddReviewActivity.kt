@@ -71,26 +71,34 @@ class AddReviewActivity : AppCompatActivity() {
                 System.currentTimeMillis()
             )
 
-            val task = ServerTaskAddReview(review)
+            val task = ServerTaskAddReview(this, review)
             task.start()
-
-            val bathroom: Bathroom? = MainActivity.bathrooms.find { bathroom -> bathroom.uniqueId == bathroomId }
-            if (bathroom != null) {
-                val oldTotalStars: Double = bathroom.averageRating * bathroom.numReviews
-                val newTotalStars: Double = oldTotalStars + selectedRating.toDouble()
-
-                bathroom.numReviews += 1
-                bathroom.averageRating = newTotalStars / bathroom.numReviews
-
-                val updateTask: ServerTaskUpdateBathroom = ServerTaskUpdateBathroom(bathroomId, bathroom.averageRating, bathroom.numReviews)
-                updateTask.start()
-            }
-
-            Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
-            finish()
         }
 
         val btnBack = findViewById<Button>(R.id.btn_back)
         btnBack.setOnClickListener { finish() }
+    }
+
+    fun onReviewAdded() {
+        val bathroomId = intent.getStringExtra("bathroomId") ?: return
+        val bathroom: Bathroom? = MainActivity.bathrooms.find { bathroom -> bathroom.uniqueId == bathroomId }
+
+        if (bathroom != null) {
+            val oldTotalStars: Double = bathroom.averageRating * bathroom.numReviews
+            val newTotalStars: Double = oldTotalStars + selectedRating.toDouble()
+
+            bathroom.numReviews += 1
+            bathroom.averageRating = newTotalStars / bathroom.numReviews
+
+            val updateTask: ServerTaskUpdateBathroom = ServerTaskUpdateBathroom(this, bathroomId, bathroom.averageRating, bathroom.numReviews)
+            updateTask.start()
+        } else {
+            finish()
+        }
+    }
+
+    fun onBathroomUpdated() {
+        Toast.makeText(this, "Review submitted!", Toast.LENGTH_SHORT).show()
+        finish()
     }
 }

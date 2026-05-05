@@ -6,9 +6,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class ServerTaskAddReview() : Thread() {
+    private lateinit var activity: AddReviewActivity
     private lateinit var review: Review
 
-    constructor(review: Review) : this() {
+    constructor(activity: AddReviewActivity, review: Review) : this() {
+        this.activity = activity
         this.review = review
     }
 
@@ -40,6 +42,8 @@ class ServerTaskAddReview() : Thread() {
             Log.d("ServerTaskAddReview", "Response code: $responseCode")
 
             connection.inputStream.close()
+
+            activity.runOnUiThread { activity.onReviewAdded() }
         } catch (e: Exception) {
             Log.w("ServerTaskAddReview", "exception: " + e.message)
         }

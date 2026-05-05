@@ -10,11 +10,13 @@ import java.net.URL
 import java.util.Scanner
 
 class ServerTaskUpdateBathroom: Thread {
+    private var activity: AddReviewActivity
     private var bathroomId: String = ""
     private var newAvgRating: Double = 0.0
     private var newNumReviews: Int = 0
 
-    constructor(bathroomId: String, newAvgRating: Double, newNumReviews: Int) {
+    constructor(activity: AddReviewActivity, bathroomId: String, newAvgRating: Double, newNumReviews: Int) {
+        this.activity = activity
         this.bathroomId = bathroomId
         this.newAvgRating = newAvgRating
         this.newNumReviews = newNumReviews
@@ -47,6 +49,8 @@ class ServerTaskUpdateBathroom: Thread {
             Log.d("UpdateBathroom", "Response code: $responseCode")
 
             connection.inputStream.close()
+
+            activity.runOnUiThread { activity.onBathroomUpdated() }
         } catch (e: Exception) {
             Log.w("UpdateBathroom", "exception: " + e.message)
         }
