@@ -20,7 +20,6 @@ class AddReviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_review)
 
-        // Get the bathroomId passed from BathroomOverviewActivity
         val bathroomId = intent.getStringExtra("bathroomId")
         if (bathroomId == null) {
             Toast.makeText(this, "Error: No bathroom selected", Toast.LENGTH_SHORT).show()
@@ -28,13 +27,10 @@ class AddReviewActivity : AppCompatActivity() {
             return
         }
 
-        // Find the bathroom name to display at the top
         val bathroom = MainActivity.bathrooms.firstOrNull { it.uniqueId == bathroomId }
         val tvTitle = findViewById<TextView>(R.id.tv_review_title)
         tvTitle.text = "Add Review"
-        //tvTitle.text = if (bathroom != null) "Review: ${bathroom.name}" else "Add Review"
 
-        // Set up the interactive RatingBar with listener
         ratingBar = findViewById(R.id.rating_bar_input)
         tvRatingLabel = findViewById(R.id.tv_rating_label)
         etComment = findViewById(R.id.et_comment)
@@ -52,7 +48,6 @@ class AddReviewActivity : AppCompatActivity() {
                 }
             }
 
-        // Submit button, validate then push to Firebase
         val btnSubmit = findViewById<Button>(R.id.btn_submit)
         btnSubmit.setOnClickListener {
             val comment = etComment.text.toString().trim()
@@ -95,7 +90,6 @@ class AddReviewActivity : AppCompatActivity() {
             finish()
         }
 
-        // Back button
         val btnBack = findViewById<Button>(R.id.btn_back)
         btnBack.setOnClickListener { finish() }
     }
