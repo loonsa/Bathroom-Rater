@@ -40,6 +40,7 @@ class BathroomOverviewActivity: AppCompatActivity() {
             this.finish()
             return
         }
+        lpdHandler.setLastViewedBathroomId(bathroom.uniqueId) //should be same thing as bathroomId variable
 
         val bathroomName: TextView = findViewById(R.id.bathroom_name)
         val buildingAndFloor: TextView = findViewById(R.id.building_and_floor)
@@ -48,8 +49,14 @@ class BathroomOverviewActivity: AppCompatActivity() {
 
         bathroomName.text = bathroom.name
         buildingAndFloor.text = "${bathroom.building} - Floor ${bathroom.floor}"
-        genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
-        adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
+        if (!bathroom.isGenderNeutral && !bathroom.isADA) {
+            genderNeutral.text = "None" //just use genderNeutral textView to hold None
+            adaAccessible.visibility = View.GONE
+        } else {
+            genderNeutral.text = "Gender Neutral"
+            genderNeutral.visibility = if (bathroom.isGenderNeutral) View.VISIBLE else View.GONE
+            adaAccessible.visibility = if (bathroom.isADA) View.VISIBLE else View.GONE
+        }
 
         ratingBar = findViewById(R.id.rating_bar)
         avgRating = findViewById(R.id.avg_rating)
@@ -90,7 +97,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
             ::avgRating.isInitialized && ::numReviews.isInitialized) {
             ratingBar.rating = bathroom.averageRating.toFloat()
             avgRating.text = bathroom.averageRating.toString()
-            numReviews.text = "${bathroom.numReviews} reviews"
+            var quantifier: String = "reviews"
+            if (bathroom.numReviews == 1) {
+                quantifier = "review"
+            }
+            numReviews.text = "${bathroom.numReviews} ${quantifier}"
             updateProgressBar(bathroom.numReviews)
 
             val task = ServerTaskGetReviews(this, bathroom.uniqueId)
@@ -119,7 +130,11 @@ class BathroomOverviewActivity: AppCompatActivity() {
             val roundedAvg = Math.round(calculatedAvg * 10) / 10.0
             ratingBar.rating = roundedAvg.toFloat()
             avgRating.text = roundedAvg.toString()
-            numReviews.text = "${reviews.size} reviews"
+            var quantifier: String = "reviews"
+            if (reviews.size == 1) {
+                quantifier = "review"
+            }
+            numReviews.text = "${reviews.size} ${quantifier}"
             updateProgressBar(reviews.size)
         }
 
